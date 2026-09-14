@@ -17,6 +17,18 @@ class CollectionSharingService {
 
   CollectionSharingService._privateConstructor();
 
+  Future<List<User>> getSharees(int collectionID) async {
+    final response = await _enteDio.get(
+      '/collections/sharees',
+      queryParameters: {'collectionID': collectionID},
+    );
+    final sharees = <User>[];
+    for (final user in response.data['sharees']) {
+      sharees.add(User.fromMap(user));
+    }
+    return sharees;
+  }
+
   Future<List<User>> share(
     int collectionID,
     String email,

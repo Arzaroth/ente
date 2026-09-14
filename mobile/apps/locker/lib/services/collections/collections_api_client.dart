@@ -568,14 +568,37 @@ class CollectionApiClient {
       CryptoUtil.base642bin(publicKey),
     );
 
-    final sharees = await CollectionSharingService.instance.share(
-      collectionID,
-      email,
-      publicKey,
-      role.toStringVal(),
-      collectionKey,
-      encryptedKey,
-    );
+    List<User> sharees;
+    try {
+      sharees = await CollectionSharingService.instance.share(
+        collectionID,
+        email,
+        publicKey,
+        role.toStringVal(),
+        collectionKey,
+        encryptedKey,
+      );
+    } on DioException catch (error, stackTrace) {
+      if (error.type != DioExceptionType.receiveTimeout) {
+        rethrow;
+      }
+
+      sharees = await CollectionSharingService.instance.getSharees(
+        collectionID,
+      );
+      final normalizedEmail = email.trim().toLowerCase();
+      final shareSucceeded = sharees.any(
+        (sharee) =>
+            sharee.email.trim().toLowerCase() == normalizedEmail &&
+            CollectionParticipantRoleExtn.fromString(sharee.role) == role,
+      );
+      if (!shareSucceeded) {
+        Error.throwWithStackTrace(error, stackTrace);
+      }
+      _logger.warning(
+        'Share response timed out, but server state confirms the share',
+      );
+    }
 
     final collection = CollectionService.instance.getFromCache(collectionID);
     final updatedCollection = collection!.copyWith(sharees: sharees);

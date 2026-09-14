@@ -326,15 +326,23 @@ class CollectionService {
       await _apiClient.trash(requests);
 
       await _db.deleteFilesFromCollection(collection, [file]);
-
-      if (runSync) {
-        await TrashService.instance.syncTrash();
-        await sync();
-        Bus.instance.fire(UserDetailsRefreshEvent());
-      }
-    } catch (e) {
-      _logger.severe("Failed to remove file from collections: $e");
+    } catch (e, stackTrace) {
+      _logger.severe('Failed to remove file from collections', e, stackTrace);
       rethrow;
+    }
+
+    if (!runSync) return;
+
+    try {
+      await TrashService.instance.syncTrash();
+      await sync();
+      Bus.instance.fire(UserDetailsRefreshEvent());
+    } catch (e, stackTrace) {
+      _logger.warning(
+        'File was trashed, but the follow-up refresh failed',
+        e,
+        stackTrace,
+      );
     }
   }
 
