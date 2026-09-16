@@ -21,6 +21,12 @@ If you use Ente Auth in offline mode, create an encrypted export or local backup
 
 App lock protects access to the app UI. It is not a recovery password for your codes and does not re-encrypt the stored Auth data.
 
+## Keep a backup before setting an app lock
+
+Before you set an app lock PIN or password in offline mode, save a backup of your codes outside the app. Keep the backup password safe too.
+
+If you forget your app lock there is no way to reset it. You will need to clear the app's data or delete and reinstall the app. This erases your saved codes and Ente cannot recover them.
+
 ## Back up your codes
 
 Open `Settings > Data > Local backup` to enable automatic local backups, or create an encrypted export from the Data settings. Keep your backup or export files and password somewhere safe.
