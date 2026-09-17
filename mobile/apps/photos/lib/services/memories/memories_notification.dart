@@ -7,22 +7,12 @@ import "package:synchronized/synchronized.dart";
 final _notificationLock = Lock();
 
 bool _hasEnoughMemories(List<SmartMemory> memories) {
-  return const [
-            MemoryType.people,
-            MemoryType.trips,
-            MemoryType.clip,
-            MemoryType.onThisDay,
-          ]
-          .where(
-            (type) => memories.any(
-              (memory) =>
-                  memory.type == type &&
-                  memory.memories.isNotEmpty &&
-                  memory.shouldShowNow(),
-            ),
-          )
-          .length >=
-      2;
+  return memories.any(
+    (m) =>
+        (m.type == .people || m.type == .clip) &&
+        m.memories.isNotEmpty &&
+        m.shouldShowNow(),
+  );
 }
 
 Future<void> scheduleMemoriesNotification(List<SmartMemory> memories) async {
