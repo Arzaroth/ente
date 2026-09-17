@@ -151,6 +151,8 @@ class LocalSettings {
   );
   static const _kCraftingMemoriesBannerDismissed =
       'is_crafting_memories_banner_dismissed';
+  static const _kInitialMemoriesNotificationScheduledAt =
+      "memories.initial_notification_scheduled_at";
 
   final SharedPreferences _prefs;
 
@@ -895,6 +897,17 @@ class LocalSettings {
 
   Future<void> setCraftingMemoriesBannerDismissed() async {
     await _prefs.setBool(_kCraftingMemoriesBannerDismissed, true);
+  }
+
+  int? initialMemoriesNotificationScheduledAt() {
+    return _prefs.getInt(_kInitialMemoriesNotificationScheduledAt);
+  }
+
+  Future<void> markInitialMemoriesNotificationScheduled() async {
+    await _prefs.setInt(
+      _kInitialMemoriesNotificationScheduledAt,
+      DateTime.now().millisecondsSinceEpoch,
+    );
   }
 
   Future<bool> getCraftingMemoriesBannerDismissed() async {

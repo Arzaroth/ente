@@ -1,0 +1,46 @@
+import "package:photos/models/memories/smart_memory.dart";
+import "package:photos/service_locator.dart";
+import "package:photos/services/language_service.dart";
+import "package:photos/services/notification_service.dart";
+import "package:synchronized/synchronized.dart";
+
+final _notificationLock = Lock();
+
+bool _hasEnoughMemories(List<SmartMemory> memories) {
+  return const [
+            MemoryType.people,
+            MemoryType.trips,
+            MemoryType.clip,
+            MemoryType.onThisDay,
+          ]
+          .where(
+            (type) => memories.any(
+              (memory) =>
+                  memory.type == type &&
+                  memory.memories.isNotEmpty &&
+                  memory.shouldShowNow(),
+            ),
+          )
+          .length >=
+      2;
+}
+
+Future<void> scheduleMemoriesNotification(List<SmartMemory> memories) async {
+  if (!flagService.internalUser || !_hasEnoughMemories(memories)) {
+    return;
+  }
+  await _notificationLock.synchronized(() async {
+    if (localSettings.initialMemoriesNotificationScheduledAt() != null) return;
+    final notifications = NotificationService.instance;
+    if (!await notifications.hasGrantedPermissions()) return;
+    final strings = await LanguageService.locals;
+    await notifications.showNotification(
+      strings.memoriesReadyNotificationTitle,
+      strings.lookBackOnYourMemories,
+      id: 314159265,
+      channelID: "memoriesReady",
+      channelName: strings.memories,
+    );
+    await localSettings.markInitialMemoriesNotificationScheduled();
+  });
+}

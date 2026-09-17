@@ -281,7 +281,7 @@ class NotificationService {
     );
   }
 
-  Future<void> scheduleNotification(
+  Future<bool> scheduleNotification(
     String title, {
     String? message,
     required int id,
@@ -338,6 +338,7 @@ class NotificationService {
           "Scheduled notification with: $title, $message, $channelID, $channelName, $payload for $dateTime",
         );
       }
+      return true;
     } catch (e, s) {
       // Notification failures must not interrupt memory or ritual updates.
       _logger.severe(
@@ -345,6 +346,7 @@ class NotificationService {
         e,
         s,
       );
+      return false;
     }
   }
 
