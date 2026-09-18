@@ -32,6 +32,7 @@ Future<void> scheduleMemoriesNotification(List<SmartMemory> memories) async {
     final strings = await LanguageService.locals;
     if (AppLifecycleService.instance.isForeground) {
       await localSettings.markInitialMemoriesNotificationScheduled();
+      return;
     }
     await notifications.showNotification(
       strings.memoriesReadyNotificationTitle,
