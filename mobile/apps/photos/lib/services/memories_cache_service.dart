@@ -29,7 +29,7 @@ import "package:photos/services/app_navigation_service.dart";
 import "package:photos/services/language_service.dart";
 import "package:photos/services/machine_learning/face_ml/person/person_service.dart";
 import "package:photos/services/machine_learning/ml_model_download_service.dart";
-import "package:photos/services/memories/memories_notification.dart";
+import "package:photos/services/memories/initial_memories_ready_notification.dart";
 import "package:photos/services/memories/photo_selector.dart";
 import "package:photos/services/notification_service.dart";
 import "package:photos/services/search_service.dart";

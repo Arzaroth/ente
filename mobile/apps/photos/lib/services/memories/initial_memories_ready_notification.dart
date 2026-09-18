@@ -25,7 +25,9 @@ Future<void> scheduleMemoriesNotification(List<SmartMemory> memories) async {
     final notifications = NotificationService.instance;
     if (!await notifications.hasGrantedPermissions()) return;
     final strings = await LanguageService.locals;
-    if (AppLifecycleService.instance.isForeground) return;
+    if (AppLifecycleService.instance.isForeground) {
+      await localSettings.markInitialMemoriesNotificationScheduled();
+    }
     await notifications.showNotification(
       strings.memoriesReadyNotificationTitle,
       strings.lookBackOnYourMemories,
