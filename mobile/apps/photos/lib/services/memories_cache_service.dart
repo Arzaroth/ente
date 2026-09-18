@@ -833,12 +833,21 @@ class MemoriesCacheService {
             21) {
       return false;
     }
-    final indexStatus = await getIndexStatus();
-    final totalItems = indexStatus.indexedItems + indexStatus.pendingItems;
-    final indexPercent = totalItems > 0
-        ? 100 * indexStatus.indexedItems / totalItems
-        : 0.0;
-    return indexPercent > 90;
+    try {
+      final indexStatus = await getIndexStatus();
+      final totalItems = indexStatus.indexedItems + indexStatus.pendingItems;
+      final indexPercent = totalItems > 0
+          ? 100 * indexStatus.indexedItems / totalItems
+          : 0.0;
+      return indexPercent > 90;
+    } catch (e, s) {
+      _logger.warning(
+        "Failed to check ML status for initial memories refresh",
+        e,
+        s,
+      );
+      return false;
+    }
   }
 
   Future<void> _scheduleMemoriesNotification(List<SmartMemory> memories) async {
@@ -887,7 +896,8 @@ class MemoriesCacheService {
     return _memoriesUpdateLock.synchronized(() async {
       final forceInitialMemoriesRefresh =
           await _shouldForceInitialMemoriesRefresh();
-      final shouldUpdate = _shouldUpdate || forced || forceInitialMemoriesRefresh;
+      final shouldUpdate =
+          _shouldUpdate || forced || forceInitialMemoriesRefresh;
       if (!shouldUpdate) {
         _logger.info(
           "No update needed (shouldUpdate: $_shouldUpdate, forced: $forced)",
