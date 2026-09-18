@@ -22,6 +22,11 @@ Future<void> scheduleMemoriesNotification(List<SmartMemory> memories) async {
   }
   await _notificationLock.synchronized(() async {
     if (localSettings.initialMemoriesNotificationScheduledAt() != null) return;
+    if (DateTime.now().difference(localSettings.getInstallDateTime()).inDays >=
+        21) {
+      await localSettings.markInitialMemoriesNotificationScheduled();
+      return;
+    }
     final notifications = NotificationService.instance;
     if (!await notifications.hasGrantedPermissions()) return;
     final strings = await LanguageService.locals;
