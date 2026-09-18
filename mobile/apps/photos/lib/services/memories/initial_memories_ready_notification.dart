@@ -35,7 +35,7 @@ Future<void> scheduleMemoriesNotification(List<SmartMemory> memories) async {
     }
     await notifications.showNotification(
       strings.memoriesReadyNotificationTitle,
-      strings.lookBackOnYourMemories,
+      strings.memoriesReadyNotificationBody,
       id: 314159265,
       channelID: "memoriesReady",
       channelName: strings.memories,
