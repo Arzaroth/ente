@@ -828,7 +828,7 @@ class MemoriesCacheService {
 
   Future<bool> _shouldForceInitialMemoriesRefresh() async {
     if (!flagService.internalUser ||
-        localSettings.initialMemoriesNotificationScheduledAt() != null ||
+        localSettings.hasForcedInitialMemoriesRefresh() ||
         DateTime.now().difference(localSettings.getInstallDateTime()).inDays >=
             21) {
       return false;
@@ -885,8 +885,10 @@ class MemoriesCacheService {
     _checkIfTimeToUpdateCache();
 
     return _memoriesUpdateLock.synchronized(() async {
-      forced = forced || await _shouldForceInitialMemoriesRefresh();
-      if ((!_shouldUpdate && !forced)) {
+      final forceInitialMemoriesRefresh =
+          await _shouldForceInitialMemoriesRefresh();
+      final shouldUpdate = _shouldUpdate || forced || forceInitialMemoriesRefresh;
+      if (!shouldUpdate) {
         _logger.info(
           "No update needed (shouldUpdate: $_shouldUpdate, forced: $forced)",
         );
@@ -989,6 +991,9 @@ class MemoriesCacheService {
         );
         w?.log("cacheWritten");
         await _cacheUpdated();
+        if (forceInitialMemoriesRefresh) {
+          await localSettings.markForcedInitialMemoriesRefresh();
+        }
         await _scheduleMemoriesNotification(_cachedMemories!);
         w?.logAndReset('_cacheUpdated method done');
       } catch (e, s) {
